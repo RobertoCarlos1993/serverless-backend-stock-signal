@@ -1,0 +1,21 @@
+{
+  "name": "serveless-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "billing.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "stripe": "^8.47.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.663.0",
+    "jest": "^25.4.0",
+    "serverless-bundle": "^1.4.0",
+    "serverless-offline": "^6.1.4"
+  }
+}

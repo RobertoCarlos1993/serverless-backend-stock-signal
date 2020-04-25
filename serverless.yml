@@ -1,0 +1,34 @@
+service: serveless-backend
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  apiKeys:
+    - securityKey
+  usagePlan:
+    quota:
+      limit: 40
+      period: MONTH
+
+functions:
+  confirmation:
+    handler: confirmation.main
+    events:
+      - http:
+          path: confirmation
+          method: post
+          cors: true
+          private: true
+  billing:
+    handler: billing.main
+    events:
+      - http:
+          path: billing
+          method: post
+          cors: true
+          private: true

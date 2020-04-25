@@ -1,0 +1,12 @@
+# package directories
+node_modules/
+jspm_packages
+
+# Serverless directories
+.serverless
+
+#VScode config
+.vscode/
+
+# Testing locally endpoint folders
+.webpack/
