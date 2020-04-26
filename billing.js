@@ -1,17 +1,49 @@
+import Responses from "./common/API_Response";
 import stripePackage from "stripe";
+import AWS from "aws-sdk";
 import handler from "./libs/handler-lib";
 import { planCost } from "./libs/billing-lib";
 
+const ssm = new AWS.SSM();
+const stripeSecretPromise = ssm
+  .getParameter({
+    Name: config.stripeKeyName,
+    WithDecryption: true,
+  })
+  .promise();
+
 export const main = handler(async (event, context) => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: `Billing...${planCost(1)}`,
-        input: event,
-      },
-      null,
-      2
-    ),
-  };
+  // Ensure minimum runtime, whenever certain params are not given
+  if (event.httpMethod !== "POST" || !event.body) {
+    return Responses._400({
+      paid: false,
+      msg: "Missing params: we cannot process with the payment",
+    });
+  }
+
+  const { token, months, email } = JSON.parse(event.body);
+  const amount = planCost(months);
+  const description = "Membership Investment";
+
+  const stripe = stripePackage(process.env.secretStripe);
+
+  try {
+    await stripe.charges.create({
+      source: token,
+      amount,
+      description,
+      receipt_email: email,
+      currency: "eur",
+    });
+
+    return Responses._200({
+      paid: true,
+      msg: "Payment has been succesfully!",
+    });
+  } catch (err) {
+    return Responses._400({
+      paid: false,
+      msg: err.message,
+    });
+  }
 });
