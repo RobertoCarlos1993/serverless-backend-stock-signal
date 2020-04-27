@@ -1,6 +1,6 @@
 import Responses from "./common/API_Response";
 import stripePackage from "stripe";
-import AWS from "aws-sdk";
+//import AWS from "aws-sdk";
 import handler from "./libs/handler-lib";
 import { planCost } from "./libs/billing-lib";
 
@@ -25,7 +25,8 @@ export const main = handler(async (event, context) => {
   const amount = planCost(months);
   const description = "Membership Investment";
 
-  const stripe = stripePackage(process.env.secretStripe);
+  const stripeSecretkey = await stripeSecretPromise;
+  const stripe = stripePackage(stripeSecretkey.Parameter.Value);
 
   try {
     await stripe.charges.create({
