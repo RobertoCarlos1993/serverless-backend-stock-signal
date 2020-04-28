@@ -1,8 +1,9 @@
 import Responses from "./common/API_Response";
+import handler from "./libs/handler-lib";
 import AWS from "aws-sdk";
 
 const SES = new AWS.SES();
-const from = "";
+const from = "Rob";
 
 export const main = handler(async (event, context) => {
   // Ensure minimum runtime, whenever certain params are not given
@@ -23,21 +24,22 @@ export const main = handler(async (event, context) => {
 
   const params = {
     Destination: {
-      ToAddress: [to],
+      ToAddresses: [to],
     },
-    Template: "afterPaid",
+    Template: "purchase-confirmation",
+    TemplateData: JSON.stringify({}),
     Source: from,
   };
 
   try {
-    await SES.sendEmail(params).promise();
+    await SES.sendTemplatedEmail(params).promise();
 
     return Responses._200({
       msg: "Email was sent succesfully!",
     });
   } catch (err) {
     return Responses._400({
-      msg: "Email could not be sent",
+      msg: err,
     });
   }
 });

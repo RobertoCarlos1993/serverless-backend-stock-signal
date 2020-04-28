@@ -1,11 +1,12 @@
 import Responses from "./common/API_Response";
 import stripePackage from "stripe";
-//import AWS from "aws-sdk";
+import AWS from "aws-sdk";
 import handler from "./libs/handler-lib";
 import { planCost } from "./libs/billing-lib";
+import config from "./config";
 
 const ssm = new AWS.SSM();
-const stripeSecretPromise = ssm
+const stripeSecretKeyPromise = ssm
   .getParameter({
     Name: config.stripeKeyName,
     WithDecryption: true,
@@ -25,8 +26,8 @@ export const main = handler(async (event, context) => {
   const amount = planCost(months);
   const description = "Membership Investment";
 
-  const stripeSecretkey = await stripeSecretPromise;
-  const stripe = stripePackage(stripeSecretkey.Parameter.Value);
+  const stripeSecretKey = await stripeSecretKeyPromise;
+  const stripe = stripePackage(stripeSecretKey.Parameter.Value);
 
   try {
     await stripe.charges.create({
